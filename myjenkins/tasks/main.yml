@@ -1,0 +1,66 @@
+# tasks file for myjenkins, for installing Jenkin on CentOS
+
+---
+  - name: Installing Jenkin dependencies
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - java-1.8.0-openjdk
+      - wget
+
+### Downloading Jenkin repositories
+
+  - name: Downloading Jenkin repositories
+    get_url:
+      url: "{{ jenkin_repo }}"
+      dest: "{{ jenkin_dest_repo }}"
+
+### Adding Key
+  - name: Importing the rpm Key
+    rpm_key:
+      key: "{{ jenkin_key }}"
+      state: present
+
+### installing jenkins
+  - name: Installing Jenkins
+    package:
+      name: "jenkins"
+      state: present
+    register: pkgoutput
+
+### Enabling Firewall rule for Jenkin access using FirewallD module
+
+  - name: Allowing port 8080
+    firewalld:
+      zone: public
+      port: 8080/tcp
+      permanent: yes
+      state: enabled
+      immediate: yes
+
+### Starting Jenkin service
+  - name: Starting Jenkins service
+    service:
+      name: jenkins
+      state: started
+      enabled: yes
+
+#### Displaying the output
+  -
+    name: Displaying "Jenkins installation output
+    debug: var=pkgoutput
+  -
+    name: Application Sucess Message
+    debug: msg="Application Jenkins has been sucessfully installed"
+
+### Taking the initial password
+  -
+    name: Jenkin default initial admin password
+    shell: "/bin/cat /var/lib/jenkins/secrets/initialAdminPassword"
+    register: admin_pass
+
+  -
+    name: Print initial initialAdminPassword
+    debug:
+      var: admin_pass

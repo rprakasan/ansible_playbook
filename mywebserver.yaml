@@ -1,0 +1,46 @@
+#### This is an ansible script for WebServer with Variables
+
+---
+  -
+    name: Creating WebServer
+    hosts: "rajesh-vm01"
+    become: yes
+    become_user: root
+    become_method: sudo
+
+    vars:
+      myapp: httpd
+      myfile: "/var/www/html/index.html"
+      mysvc: httpd
+
+
+## Creating WebServer module and webplage.
+
+    tasks:
+     -
+        name: Installing {{myapp}} package now
+        package:
+          name: "{{myapp}}"
+          state: present
+        register: pkgoutput
+     -
+       name: Creating {{myfile}} webpage
+       copy:
+         dest: "{{myfile}}"
+         content: "<h1><marquee> This is my WebServer Developed in ansible -Rajesh Prakasan </marquee></h1>"
+     -
+       name: enabling Fiewall allowing port 80 and 443
+       shell: firewall-cmd --zone=public --add-service=http
+
+
+###       shell: iptables -I INPUT -p tcp --match multiport --dports 80,443 -m state --state NEW,ESTABLISHED -j ACCEPT
+     -
+       name: Starting "{{mysvc}}"
+       service:
+         name="{{mysvc}}" state=started enabled=yes
+     -
+       name: Displaying "{{myapp}}" installation output
+       debug: var=pkgoutput
+     -
+       name: Application Sucess Message
+       debug: msg="Application "{{myapp}}" has been sucessfully installed"

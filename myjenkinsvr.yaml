@@ -1,0 +1,14 @@
+#### This is an ansible script for WebServer with Variables
+#### Written by Rajesh Prakasan
+---
+  -
+    name: Installing Jenkin Server
+    hosts: "rajesh-vm01"
+    become: yes
+    become_user: root
+    become_method: sudo
+
+    tasks:
+      -
+        import_role:
+          name: myjenkins
