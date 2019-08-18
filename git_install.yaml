@@ -1,0 +1,19 @@
+#### This Playbook is for installing Git in a remote machine
+---
+
+- name: Installing git on rajesh-vm01
+  hosts: rajesh-vm01
+  become: yes
+  become_user: root
+  become_method: sudo
+
+#### Defining the tasks inclued for installation of git
+
+  tasks:
+
+  - name: Installing git
+    package: name=git state=present
+
+  - name: checking Git version installed
+    command: git --version
+
